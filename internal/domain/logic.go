@@ -77,7 +77,6 @@ func (s *gameService) minimax(game Game, player, dep, symPC int) int {
 func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false когда новая игра или ошибка
 	legacyGame, err := s.repo.Get(game.ID)
 	if err != nil {
-		fmt.Println("i am here")
 		grid := make([][]int, 3, 3)
 		for i := 0; i < 3; i++ {
 			grid[i] = make([]int, 3)
@@ -94,10 +93,9 @@ func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false ког�
 		})
 		return false, nil
 	}
-	//if len(game.Board.Grid) == 0 {
-	//	fmt.Println("Game is empty")
-	//	return false, fmt.Errorf("Invalid GameField")
-	//}
+	if whoPC(*game) == -1 {
+		return false, fmt.Errorf("Invalid game")
+	}
 	counter := 0
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
@@ -126,8 +124,10 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 		diaR += game.Board.Grid[i][2-i]
 	}
 	if diaL == 3 || diaR == 3 {
+		_ = s.repo.Delete(game.ID) // удаление игры из памяти
 		return X
 	} else if diaL == -3 || diaR == -3 {
+		_ = s.repo.Delete(game.ID) // удаление игры из памяти
 		return O
 	}
 
@@ -139,8 +139,10 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 			ver += game.Board.Grid[j][i]
 		}
 		if hor == 3 || ver == 3 {
+			_ = s.repo.Delete(game.ID) // удаление игры из памяти
 			return X
 		} else if hor == -3 || ver == -3 {
+			_ = s.repo.Delete(game.ID) // удаление игры из памяти
 			return O
 		}
 	}
@@ -171,6 +173,8 @@ func whoPC(game Game) int {
 	}
 	if counterX == counterO {
 		return X
+	} else if counterO > counterX || counterX-counterO > 1 {
+		return -1 // обработка случая, что кто то сходил 2 раза подряд
 	}
 	return O
 }

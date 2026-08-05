@@ -11,4 +11,5 @@ type GameService interface {
 type GameRepository interface {
 	Save(game Game) error
 	Get(id uuid.UUID) (Game, error)
+	Delete(id uuid.UUID) error
 }

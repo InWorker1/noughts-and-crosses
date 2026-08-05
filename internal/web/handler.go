@@ -50,9 +50,7 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	game = h.service.GetNextMove(game)
-	winner := h.service.GameOver(game)
-
-	req = GetJson(game, winner)
+	req = GetJson(game, h.service.GameOver(game))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)         // хэд статуса

@@ -33,3 +33,12 @@ func (r *gameRepository) Get(id uuid.UUID) (domain.Game, error) {
 	}
 	return DSIntoGame(ds), nil
 }
+
+func (r *gameRepository) Delete(id uuid.UUID) error {
+	_, ok := r.storage.data.Load(id)
+	if !ok {
+		return fmt.Errorf("failed delete game", id)
+	}
+	r.storage.data.Delete(id)
+	return nil
+}
