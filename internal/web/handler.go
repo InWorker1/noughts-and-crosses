@@ -17,7 +17,7 @@ func NewGameHandler(s domain.GameService) *GameHandler {
 }
 
 func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
-	gameId := r.PathValue("uuid")
+	Id := r.PathValue("uuid")
 
 	var req JsonRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -26,15 +26,15 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req.Id, err = uuid.Parse(gameId)
+	gameId, err := uuid.Parse(Id)
 	if err != nil {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
 
-	game := GetDomain(req)
+	game := GetDomain(req, gameId)
 
-	if flag, err := h.service.ValidateBoard(game); err != nil { // ошибка плохо
+	if flag, err := h.service.ValidateBoard(&game); err != nil { // ошибка плохо
 		http.Error(w, "Invalid game", http.StatusBadRequest)
 		return
 	} else if !flag { // флаг на то есть вообще эта игра или ее нет, если нет то мы ее создали

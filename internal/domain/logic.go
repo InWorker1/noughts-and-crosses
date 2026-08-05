@@ -2,8 +2,6 @@ package domain
 
 import (
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 type gameService struct {
@@ -27,11 +25,11 @@ func (s *gameService) GetNextMove(game Game) Game {
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if game.Board.Grid[i][j] == Void {
-				gameClone := game
-				gameClone.Board.Grid[i][j] = PC
-				result := s.minimax(gameClone, -PC, 1, PC)
+				clone := gameClone(game)
+				clone.Board.Grid[i][j] = PC
+				result := s.minimax(clone, -PC, 1, PC)
 				if result > bestVar.score {
-					bestVar.g = gameClone
+					bestVar.g = clone
 					bestVar.score = result
 				}
 			}
@@ -62,9 +60,9 @@ func (s *gameService) minimax(game Game, player, dep, symPC int) int {
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if game.Board.Grid[i][j] == Void {
-				gameClone := game
-				gameClone.Board.Grid[i][j] = player
-				result := s.minimax(gameClone, -player, dep+1, symPC)
+				clone := gameClone(game)
+				clone.Board.Grid[i][j] = player
+				result := s.minimax(clone, -player, dep+1, symPC)
 				if result > bestScore && player == symPC {
 					bestScore = result
 				} else if result < bestScore && player != symPC {
@@ -76,21 +74,30 @@ func (s *gameService) minimax(game Game, player, dep, symPC int) int {
 	return bestScore
 }
 
-func (s *gameService) ValidateBoard(game Game) (bool, error) { // false когда новая игра или ошибка
+func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false когда новая игра или ошибка
 	legacyGame, err := s.repo.Get(game.ID)
 	if err != nil {
-		id, _ := uuid.NewUUID()
-		s.repo.Save(Game{ID: id,
+		fmt.Println("i am here")
+		grid := make([][]int, 3, 3)
+		for i := 0; i < 3; i++ {
+			grid[i] = make([]int, 3)
+			for j := 0; j < 3; j++ {
+				grid[i][j] = Void
+			}
+		}
+		game.Board.Grid = grid
+		s.repo.Save(Game{
+			ID: game.ID,
 			Board: GameField{
-				Grid: [][]int{
-					{Void, Void, Void},
-					{Void, Void, Void},
-					{Void, Void, Void},
-				},
+				Grid: grid,
 			},
 		})
 		return false, nil
 	}
+	//if len(game.Board.Grid) == 0 {
+	//	fmt.Println("Game is empty")
+	//	return false, fmt.Errorf("Invalid GameField")
+	//}
 	counter := 0
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
@@ -166,4 +173,17 @@ func whoPC(game Game) int {
 		return X
 	}
 	return O
+}
+
+func gameClone(game Game) Game {
+	var clone Game
+	clone.ID = game.ID
+	clone.Board.Grid = make([][]int, 3)
+	for i := 0; i < 3; i++ {
+		clone.Board.Grid[i] = make([]int, 3)
+		for j := 0; j < 3; j++ {
+			clone.Board.Grid[i][j] = game.Board.Grid[i][j]
+		}
+	}
+	return clone
 }

@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type GameService interface {
 	GetNextMove(game Game) Game
-	ValidateBoard(game Game) (bool, error)
+	ValidateBoard(game *Game) (bool, error)
 	GameOver(game Game) int
 }
 
