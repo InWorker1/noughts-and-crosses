@@ -6,6 +6,8 @@ import (
 	"go.uber.org/fx"
 )
 
+// @von (Petya Mishin)
+
 func main() {
 	fx.New(di.CreateApp()).Run()
 
