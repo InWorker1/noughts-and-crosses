@@ -1,4 +1,4 @@
-package repository
+package sync_map
 
 import "sync"
 

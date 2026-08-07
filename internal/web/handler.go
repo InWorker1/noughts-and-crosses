@@ -19,16 +19,16 @@ func NewGameHandler(s domain.GameService) *GameHandler {
 func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 	Id := r.PathValue("uuid")
 
-	var req JsonRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
-		return
-	}
-
 	gameId, err := uuid.Parse(Id)
 	if err != nil {
 		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	var req JsonRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 

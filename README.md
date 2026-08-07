@@ -63,11 +63,11 @@ Web (handler) → Domain (бизнес-логика) → Repository (хране�
 
 ## 2. Repository слой — хранение данных
 
-### Хранилище (`internal/repository/datasource.go`)
+### Хранилище (`internal/repository/sync-map/datasource.go`)
 
 **GameStorage** — обёртка над `sync.Map` для потокобезопасного хранения игр в памяти.
 
-### Маппинг (`internal/repository/mapper.go`)
+### Маппинг (`internal/repository/sync-map/mapper.go`)
 
 Преобразует domain-модели во внутренний формат хранилища и обратно:
 
@@ -79,7 +79,7 @@ Web (handler) → Domain (бизнес-логика) → Repository (хране�
 - `GameIntoDS` — конвертирует domain.Game в Storage
 - `DSIntoGame` — конвертирует Storage обратно в domain.Game
 
-### Реализация репозитория (`internal/repository/repo.go`)
+### Реализация репозитория (`internal/repository/sync-map/repo.go`)
 
 **gameRepository** — хранит ссылку на GameStorage
 

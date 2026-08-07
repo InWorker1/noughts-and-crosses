@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"game/internal/domain"
-	"game/internal/repository"
+	"game/internal/repository/sync-map"
 	"game/internal/web"
 	"net/http"
 
@@ -18,8 +18,8 @@ func NewMux() *http.ServeMux {
 func CreateApp() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			repository.NewGameStorage,
-			repository.NewGameRepo,
+			sync_map.NewGameStorage,
+			sync_map.NewGameRepo,
 			domain.NewGameService,
 			web.NewGameHandler,
 			NewMux,
