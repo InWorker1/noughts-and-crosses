@@ -1,6 +1,8 @@
-package domain
+package game
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type GameService interface {
 	GetNextMove(game Game) (Game, error)

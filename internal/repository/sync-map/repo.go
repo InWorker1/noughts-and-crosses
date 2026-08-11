@@ -2,7 +2,7 @@ package sync_map
 
 import (
 	"fmt"
-	"game/internal/domain"
+	"game/internal/domain/game"
 
 	"github.com/google/uuid"
 )
@@ -11,25 +11,25 @@ type gameRepository struct { // структура, которая реализ�
 	storage *GameStorage
 }
 
-func NewGameRepo(s *GameStorage) domain.GameRepository {
+func NewGameRepo(s *GameStorage) game.GameRepository {
 	return &gameRepository{storage: s}
 }
 
-func (r *gameRepository) Save(game domain.Game) error {
+func (r *gameRepository) Save(game game.Game) error {
 	ds := GameIntoDS(game)
 	r.storage.data.Store(ds.Key, ds)
 	return nil
 }
 
-func (r *gameRepository) Get(id uuid.UUID) (domain.Game, error) {
+func (r *gameRepository) Get(id uuid.UUID) (game.Game, error) {
 	val, ok := r.storage.data.Load(id)
 	if !ok {
-		return domain.Game{}, fmt.Errorf("failed game with ID %s not found", id)
+		return game.Game{}, fmt.Errorf("failed game with ID %s not found", id)
 	}
 
 	ds, ok := val.(Storage)
 	if !ok {
-		return domain.Game{}, fmt.Errorf("failed to cast data from store")
+		return game.Game{}, fmt.Errorf("failed to cast data from store")
 	}
 	return DSIntoGame(ds), nil
 }

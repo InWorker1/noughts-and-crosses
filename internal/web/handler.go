@@ -2,17 +2,17 @@ package web
 
 import (
 	"encoding/json"
-	"game/internal/domain"
+	"game/internal/domain/game"
 	"net/http"
 
 	"github.com/google/uuid"
 )
 
 type GameHandler struct {
-	service domain.GameService
+	service game.GameService
 }
 
-func NewGameHandler(s domain.GameService) *GameHandler {
+func NewGameHandler(s game.GameService) *GameHandler {
 	return &GameHandler{service: s}
 }
 

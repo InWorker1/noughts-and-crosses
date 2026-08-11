@@ -20,7 +20,7 @@ Web (handler) → Domain (бизнес-логика) → Repository (хране�
 
 ## 1. Domain слой — бизнес-логика
 
-### Модели (`internal/domain/models.go`)
+### Модели (`internal/domain/game/models.go`)
 
 **Game** — основная модель игры:
 - `ID` — уникальный идентификатор игры (UUID)
@@ -31,7 +31,7 @@ Web (handler) → Domain (бизнес-логика) → Repository (хране�
 - `-1` = нолик (O)
 - `0` = пустая клетка
 
-### Контракты/интерфейсы (`internal/domain/service.go`)
+### Контракты/интерфейсы (`internal/domain/game/gameService.go`)
 
 **GameService** — интерфейс сервиса игры:
 - `GetNextMove(game)` — вычислить следующий ход ИИ
@@ -42,7 +42,7 @@ Web (handler) → Domain (бизнес-логика) → Repository (хране�
 - `Save(game)` — сохранить игру
 - `Get(id)` — получить игру по ID
 
-### Бизнес-логика (`internal/domain/logic.go`)
+### Бизнес-логика (`internal/domain/game/logic.go`)
 
 Реализация в структуре `gameService`:
 
