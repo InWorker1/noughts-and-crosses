@@ -8,10 +8,10 @@ import (
 )
 
 type gameRepository struct {
-	data gameDataBase
+	data *gameDataBase
 }
 
-func NewGameRepository(store gameDataBase) domain.GameRepository {
+func NewGameRepository(store *gameDataBase) domain.GameRepository {
 	return &gameRepository{data: store}
 }
 
@@ -21,7 +21,7 @@ func NewGameRepository(store gameDataBase) domain.GameRepository {
 
 func (repo *gameRepository) Save(game domain.Game) error {
 	unit := DomainIntoRepo(game)
-	_, err := repo.data.db.Exec(context.Background(), "INSERT INTO games VALUES ($1, $2)", unit.id, unit.grid)
+	_, err := repo.data.db.Exec(context.Background(), "INSERT INTO games(id, grid) VALUES ($1, $2)", unit.id, unit.grid)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (repo *gameRepository) Save(game domain.Game) error {
 func (repo *gameRepository) Get(id uuid.UUID) (domain.Game, error) {
 	row := repo.data.db.QueryRow(context.Background(), "SELECT * FROM games WHERE id = $1", id)
 	var unit sqlStore
-	if err := row.Scan(&unit); err != nil {
+	if err := row.Scan(&unit.id, &unit.grid); err != nil {
 		return domain.Game{}, err
 	}
 	return RepoIntoDomain(unit), nil

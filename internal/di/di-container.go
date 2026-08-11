@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"game/internal/domain"
-	"game/internal/repository/sync-map"
+	"game/internal/repository/postgres"
 	"game/internal/web"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 
 	"go.uber.org/fx"
 )
@@ -15,14 +18,24 @@ func NewMux() *http.ServeMux {
 	return http.NewServeMux()
 }
 
+func NewDSN() string {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+	user, pass, host, port, dbname := os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("HOST"), os.Getenv("PORT"), os.Getenv("DB_NAME")
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, pass, host, port, dbname)
+}
+
 func CreateApp() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			sync_map.NewGameStorage,
-			sync_map.NewGameRepo,
+			postgres.NewGameDataBase,
+			postgres.NewGameRepository,
 			domain.NewGameService,
 			web.NewGameHandler,
 			NewMux,
+			NewDSN,
 		),
 		fx.Invoke(
 			RegisterRout,

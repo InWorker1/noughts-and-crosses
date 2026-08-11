@@ -8,15 +8,16 @@ import (
 
 // mockRepository - моковая реализация GameRepository для тестов
 type mockRepository struct {
-	savedGames []Game
+	savedGames map[uuid.UUID]*Game
 }
 
 func (m *mockRepository) Save(game Game) error {
-	m.savedGames = append(m.savedGames, game)
+	uuid, _ := uuid.NewUUID()
+	m.savedGames[uuid] = &game
 	return nil
 }
 
-func (m *mockRepository) Get(id uuid.UUID) (Game, error) { return Game{}, nil }
+func (m *mockRepository) Get(id uuid.UUID) (Game, error) { return *m.savedGames[id], nil }
 
 func (m *mockRepository) Delete(id uuid.UUID) error { return nil }
 

@@ -49,7 +49,11 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	game = h.service.GetNextMove(game)
+	game, err = h.service.GetNextMove(game)
+	if err != nil {
+		http.Error(w, "sorry..", 500)
+		return
+	}
 	req = GetJson(game, h.service.GameOver(game))
 
 	w.Header().Set("Content-Type", "application/json")

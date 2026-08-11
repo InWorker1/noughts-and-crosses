@@ -17,3 +17,5 @@ func NewGameDataBase(dsn string) *gameDataBase {
 	}
 	return &gameDataBase{db: pool}
 }
+
+//postgres://user:password@localhost:5432/dbname?sslmode=off

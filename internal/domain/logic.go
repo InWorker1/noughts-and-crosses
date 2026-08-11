@@ -14,7 +14,7 @@ func NewGameService(r GameRepository) GameService {
 	}
 }
 
-func (s *gameService) GetNextMove(game Game) Game {
+func (s *gameService) GetNextMove(game Game) (Game, error) {
 	var bestVar struct {
 		g     Game
 		score int
@@ -35,43 +35,11 @@ func (s *gameService) GetNextMove(game Game) Game {
 			}
 		}
 	}
-	s.repo.Save(bestVar.g)
-	return bestVar.g
-}
-
-func (s *gameService) minimax(game Game, player, dep, symPC int) int {
-	winner := s.GameOver(game)
-	if winner != 0 {
-		switch winner {
-		case symPC:
-			return 10 - dep
-		default:
-			return -10 + dep
-		}
-	} else if winner == 0 && gridIsFull(game) {
-		return 0
+	err := s.repo.Save(bestVar.g)
+	if err != nil {
+		return Game{}, err
 	}
-	var bestScore int
-	if player == symPC {
-		bestScore = -1000 // Для ПК ищем максимум, стартуем со дна
-	} else {
-		bestScore = 1000 // Для человека ищем минимум, стартуем с потолка
-	}
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			if game.Board.Grid[i][j] == Void {
-				clone := gameClone(game)
-				clone.Board.Grid[i][j] = player
-				result := s.minimax(clone, -player, dep+1, symPC)
-				if result > bestScore && player == symPC {
-					bestScore = result
-				} else if result < bestScore && player != symPC {
-					bestScore = result
-				}
-			}
-		}
-	}
-	return bestScore
+	return bestVar.g, nil
 }
 
 func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false когда новая игра или ошибка
@@ -85,12 +53,15 @@ func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false ког�
 			}
 		}
 		game.Board.Grid = grid
-		s.repo.Save(Game{
+		err := s.repo.Save(Game{
 			ID: game.ID,
 			Board: GameField{
 				Grid: grid,
 			},
 		})
+		if err != nil {
+			return false, err
+		}
 		return false, nil
 	}
 	if whoPC(*game) == -1 {
@@ -147,6 +118,41 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 		}
 	}
 	return 0
+}
+
+func (s *gameService) minimax(game Game, player, dep, symPC int) int {
+	winner := s.GameOver(game)
+	if winner != 0 {
+		switch winner {
+		case symPC:
+			return 10 - dep
+		default:
+			return -10 + dep
+		}
+	} else if winner == 0 && gridIsFull(game) {
+		return 0
+	}
+	var bestScore int
+	if player == symPC {
+		bestScore = -1000 // Для ПК ищем максимум, стартуем со дна
+	} else {
+		bestScore = 1000 // Для человека ищем минимум, стартуем с потолка
+	}
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			if game.Board.Grid[i][j] == Void {
+				clone := gameClone(game)
+				clone.Board.Grid[i][j] = player
+				result := s.minimax(clone, -player, dep+1, symPC)
+				if result > bestScore && player == symPC {
+					bestScore = result
+				} else if result < bestScore && player != symPC {
+					bestScore = result
+				}
+			}
+		}
+	}
+	return bestScore
 }
 
 func gridIsFull(game Game) bool {

@@ -8,7 +8,14 @@ import (
 
 func main() {
 	fx.New(di.CreateApp()).Run()
-
+	//mux := http.NewServeMux()
+	//var dsn string
+	//db := postgres.NewGameDataBase(dsn)
+	//repo := postgres.NewGameRepository(db)
+	//service := domain.NewGameService(repo)
+	//handler := web.NewGameHandler(service)
+	//
+	//mux.HandleFunc("/game/{uuid}", handler.Move)
 	//mux := http.NewServeMux() LEGACY
 	//
 	//gameStorage := repository.NewGameStorage()
