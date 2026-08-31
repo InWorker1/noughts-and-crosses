@@ -3,7 +3,7 @@ package user
 import "github.com/google/uuid"
 
 type UserService interface {
-	Register(login, password string) uuid.UUID
+	SaveNewPerson(login, password string) uuid.UUID
 }
 
 type UserRepository interface {

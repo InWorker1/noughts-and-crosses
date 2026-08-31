@@ -15,7 +15,7 @@ func NewUserService(r UserRepository) UserService {
 	return &userService{repo: r}
 }
 
-func (s *userService) Register(login, password string) uuid.UUID {
+func (s *userService) SaveNewPerson(login, password string) uuid.UUID {
 	_, err := s.repo.GetByUsername(login)
 	if !errors.Is(err, domainErrors.ErrPersonNotFound) {
 		return uuid.Nil
@@ -31,3 +31,7 @@ func (s *userService) Register(login, password string) uuid.UUID {
 	}
 	return id
 }
+
+//func (s *userService) Login(login, password string) (uuid.UUID, error) {
+//
+//}
