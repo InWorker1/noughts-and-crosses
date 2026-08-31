@@ -32,6 +32,10 @@ func (s *userService) SaveNewPerson(login, password string) uuid.UUID {
 	return id
 }
 
-//func (s *userService) Login(login, password string) (uuid.UUID, error) {
-//
-//}
+func (s *userService) GetPerson(login, password string) (User, error) {
+	user, err := s.repo.GetByUsername(login)
+	if err != nil {
+		return User{}, domainErrors.ErrPersonNotFound
+	}
+	return user, nil
+}

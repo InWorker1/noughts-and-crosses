@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"encoding/base64"
 	"game/internal/domain/domainErrors"
 	"game/internal/domain/user"
+	"strings"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -22,20 +24,42 @@ func (a *authService) Register(request SignUpRequest) error {
 	if err != nil {
 		return err
 	}
-	id := a.uService.Register(request.Login, request.Pass)
+	id := a.uService.SaveNewPerson(request.Login, request.Pass)
 	if id == uuid.Nil {
 		return domainErrors.ErrInvalidLoginOrPass
 	}
 	return nil
 } // гуд
 
-func (a *authService) Login(request SignUpRequest) (string, error) {
+func (a *authService) Login(creds string) (uuid.UUID, error) {
+	decCreds, err := base64.StdEncoding.DecodeString(creds)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	parts := strings.SplitN(creds, ":", 2)
+	if len(parts) != 2 {
+		return uuid.Nil, domainErrors.ErrInvalidLoginOrPass
+	}
+
+	user, err := a.uService.GetPerson(parts[0], parts[1])
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Pass), []byte(parts[1]))
+	if err != nil {
+		return uuid.Nil, domainErrors.ErrInvalidLoginOrPass
+	}
+
+	return user.Id, nil
+
 	//passDB, err := a.uService.GetByUsername(request.Login)
 	//if err != nil {
 	//	return "", err
 	//}
 	//
 	//err = bcrypt.CompareHashAndPassword([]byte(passDB), []byte(request.Pass))
+
 	//if err != nil {
 	//	return "", errors.New("invalid password")
 	//}
