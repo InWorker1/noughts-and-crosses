@@ -36,7 +36,7 @@ func (a *authService) Login(creds string) (uuid.UUID, error) {
 	if err != nil {
 		return uuid.Nil, err
 	}
-	parts := strings.SplitN(creds, ":", 2)
+	parts := strings.SplitN(string(decCreds), ":", 2)
 	if len(parts) != 2 {
 		return uuid.Nil, domainErrors.ErrInvalidLoginOrPass
 	}
