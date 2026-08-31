@@ -92,13 +92,13 @@ Web (handler) → Domain (бизнес-логика) → Repository (хране�
 
 ## 3. Web слой — HTTP обработчики
 
-### Web модели (`internal/web/models.go`)
+### Web модели (`internal/web/gameHandler/models.go`)
 
 **JsonRequest** — модель для JSON запросов и ответов:
 - `Board` — игровое поле (JSON тег `game`)
 - `Winner` — победитель (JSON тег `winner`)
 
-### Маппинг (`internal/web/mapper.go`)
+### Маппинг (`internal/web/game/mapper.go`)
 
 Преобразует web-модели в domain-модели и обратно:
 
@@ -106,7 +106,7 @@ Web (handler) → Domain (бизнес-логика) → Repository (хране�
 - `GetJson(game, winner)` — конвертирует domain.Game + победитель в JsonRequest
 - `GetDomain(req, id)` — конвертирует JsonRequest + UUID в domain.Game
 
-### HTTP обработчик (`internal/web/handler.go`)
+### HTTP обработчик (`internal/web/game/handler.go`)
 
 **GameHandler** — хранит ссылку на `domain.GameService`
 

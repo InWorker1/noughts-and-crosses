@@ -1,4 +1,4 @@
-package web
+package game
 
 import (
 	"game/internal/domain/game"

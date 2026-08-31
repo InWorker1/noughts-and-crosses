@@ -1,40 +1,55 @@
 package auth
 
 import (
-	"errors"
 	"game/internal/domain/domainErrors"
+	"game/internal/domain/user"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type authService struct {
-	repo AuthRepository
+	uService user.UserService
 }
 
-func NewAuthService(r AuthRepository) AuthService {
-	return &authService{repo: r}
+func NewAuthService(r user.UserService) AuthService {
+	return &authService{uService: r}
 }
 
 func (a *authService) Register(request SignUpRequest) error {
-	_, err := a.repo.GetByUsername(request.Login)
-	if !errors.Is(err, domainErrors.ErrPersonNotFound) {
-		return err
-	}
-
-	hashB, err := bcrypt.GenerateFromPassword([]byte(request.Pass), bcrypt.DefaultCost)
+	var err error
+	request.Pass, err = HashPassword(request.Pass)
 	if err != nil {
 		return err
 	}
-	request.Pass = string(hashB)
-
-	err = a.repo.Create(request)
-	if err != nil {
-		return err
+	id := a.uService.Register(request.Login, request.Pass)
+	if id == uuid.Nil {
+		return domainErrors.ErrInvalidLoginOrPass
 	}
-
 	return nil
-}
+} // гуд
 
 func (a *authService) Login(request SignUpRequest) (string, error) {
-	return "", nil
+	//passDB, err := a.uService.GetByUsername(request.Login)
+	//if err != nil {
+	//	return "", err
+	//}
+	//
+	//err = bcrypt.CompareHashAndPassword([]byte(passDB), []byte(request.Pass))
+	//if err != nil {
+	//	return "", errors.New("invalid password")
+	//}
+	//
+	//token := fmt.Sprintf("%s:%s", request.Login, request.Pass)
+	//token = base64.StdEncoding.EncodeToString([]byte(token))
+	//
+	//return token, nil
+}
+
+func HashPassword(password string) (string, error) {
+	hashB, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashB), nil
 }

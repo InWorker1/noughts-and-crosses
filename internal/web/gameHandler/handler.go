@@ -1,4 +1,4 @@
-package web
+package game
 
 import (
 	"encoding/json"
