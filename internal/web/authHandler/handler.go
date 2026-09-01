@@ -6,15 +6,15 @@ import (
 	"net/http"
 )
 
-type authHandler struct {
+type AuthHandler struct {
 	service auth.AuthService
 }
 
-func NewAuthHandler(service auth.AuthService) *authHandler {
-	return &authHandler{service: service}
+func NewAuthHandler(service auth.AuthService) *AuthHandler {
+	return &AuthHandler{service: service}
 }
 
-func (h *authHandler) Register(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var req JsonRequestReg
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -31,7 +31,7 @@ func (h *authHandler) Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *authHandler) Login(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	cred := r.Header.Get("Authorization")
 	if cred == "" {
 		http.Error(w, "invalid authorization header", http.StatusUnauthorized)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"game/internal/domain/game"
 	"game/internal/repository/postgres"
+	"game/internal/web/authHandler"
 	game2 "game/internal/web/gameHandler"
 	"net/http"
 	"os"
@@ -34,6 +35,7 @@ func CreateApp() fx.Option {
 			postgres.NewGameRepository,
 			game.NewGameService,
 			game2.NewGameHandler,
+			authHandler.NewAuthHandler,
 			NewMux,
 			NewDSN,
 		),
@@ -44,8 +46,10 @@ func CreateApp() fx.Option {
 	)
 }
 
-func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler) {
+func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler, authHand *authHandler.AuthHandler) {
 	mux.HandleFunc("/game/{uuid}", gameHand.Move)
+	mux.HandleFunc("/auth/reg", authHand.Register)
+	mux.HandleFunc("/auth/log", authHand.Login)
 }
 
 func ListenServer(lc fx.Lifecycle, mux *http.ServeMux) {
