@@ -8,7 +8,7 @@ CREATE TABLE users(
                       id uuid not null unique,
                       login TEXT not null unique,
                       password TEXT not null,
-                      game_now uuid not null unique,
+                      game_now uuid unique,
 --     games uuid[],
                       constraint fk_id_game foreign key (game_now) references games(id)
 );
