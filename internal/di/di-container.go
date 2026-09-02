@@ -3,7 +3,9 @@ package di
 import (
 	"context"
 	"fmt"
+	"game/internal/domain/auth"
 	"game/internal/domain/game"
+	"game/internal/domain/user"
 	"game/internal/repository/postgres"
 	"game/internal/web/authHandler"
 	game2 "game/internal/web/gameHandler"
@@ -33,8 +35,11 @@ func CreateApp() fx.Option {
 		fx.Provide(
 			postgres.NewGameDataBase,
 			postgres.NewGameRepository,
+			postgres.NewUserRepo,
 			game.NewGameService,
 			game2.NewGameHandler,
+			user.NewUserService,
+			auth.NewAuthService,
 			authHandler.NewAuthHandler,
 			NewMux,
 			NewDSN,

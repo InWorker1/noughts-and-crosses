@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/base64"
+	"fmt"
 	"game/internal/domain/domainErrors"
 	"game/internal/domain/user"
 	"strings"
@@ -46,7 +47,14 @@ func (a *authService) Login(creds string) (uuid.UUID, error) {
 		return uuid.Nil, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Pass), []byte(parts[1]))
+	cleanPart := strings.TrimSpace(parts[1])
+	fmt.Println("=== DEBUG СТАРТ ===")
+	fmt.Printf("1. Хэш из БД: %q\n", user.Pass)
+	fmt.Printf("2. Длина хэша: %d (ДОЛЖНА БЫТЬ СТРОГО 60)\n", len(user.Pass))
+	fmt.Printf("3. Чистый пароль: %q\n", parts[1])
+	fmt.Printf("4. Байты пароля: %v\n", []byte(parts[1]))
+	fmt.Println("===================")
+	err = bcrypt.CompareHashAndPassword([]byte(user.Pass), []byte(cleanPart))
 	if err != nil {
 		return uuid.Nil, domainErrors.ErrInvalidLoginOrPass
 	}

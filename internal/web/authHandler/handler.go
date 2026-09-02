@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"game/internal/domain/auth"
 	"net/http"
+	"strings"
 )
 
 type AuthHandler struct {
@@ -37,7 +38,8 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid authorization header", http.StatusUnauthorized)
 		return
 	}
-
+	cred = strings.TrimPrefix(cred, "Basic ")
+	cred = strings.TrimSpace(cred)
 	uuid, err := h.service.Login(cred)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
