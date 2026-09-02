@@ -15,6 +15,8 @@ func NewGameService(r GameRepository) GameService {
 }
 
 func (s *gameService) GetNextMove(game Game) (Game, error) {
+	var filledGrid bool
+
 	var bestVar struct {
 		g     Game
 		score int
@@ -25,6 +27,7 @@ func (s *gameService) GetNextMove(game Game) (Game, error) {
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
 			if game.Board.Grid[i][j] == Void {
+				filledGrid = true
 				clone := gameClone(game)
 				clone.Board.Grid[i][j] = PC
 				result := s.minimax(clone, -PC, 1, PC)
@@ -34,6 +37,9 @@ func (s *gameService) GetNextMove(game Game) (Game, error) {
 				}
 			}
 		}
+	}
+	if !filledGrid {
+		return game, nil
 	}
 	err := s.repo.Save(bestVar.g)
 	if err != nil {
@@ -64,9 +70,9 @@ func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false ког�
 		}
 		return false, nil
 	}
-	if whoPC(*game) == -1 {
-		return false, fmt.Errorf("Invalid game")
-	}
+	//if whoPC(*game) == -1 {
+	//	return false, fmt.Errorf("Invalid game")
+	//} 									я в душе не знаю откуда это появилось и зачем. не разрешает пользователю быть крестиком
 	counter := 0
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
@@ -101,11 +107,14 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 		_ = s.repo.Delete(game.ID) // удаление игры из памяти
 		return O
 	}
-
+	var counterVoid int
 	for i := 0; i < 3; i++ {
 		hor = 0
 		ver = 0
 		for j := 0; j < 3; j++ {
+			if game.Board.Grid[i][j] == Void {
+				counterVoid++
+			}
 			hor += game.Board.Grid[i][j]
 			ver += game.Board.Grid[j][i]
 		}
@@ -115,6 +124,9 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 		} else if hor == -3 || ver == -3 {
 			_ = s.repo.Delete(game.ID) // удаление игры из памяти
 			return O
+		}
+		if counterVoid == 0 {
+			return Draw
 		}
 	}
 	return 0
@@ -126,6 +138,8 @@ func (s *gameService) minimax(game Game, player, dep, symPC int) int {
 		switch winner {
 		case symPC:
 			return 10 - dep
+		case Draw:
+			return 5 - dep // добавление ничьи
 		default:
 			return -10 + dep
 		}

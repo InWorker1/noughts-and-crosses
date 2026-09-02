@@ -52,7 +52,7 @@ func CreateApp() fx.Option {
 }
 
 func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler, authHand *authHandler.AuthHandler) {
-	mux.HandleFunc("/game/{uuid}", gameHand.Move)
+	mux.HandleFunc("/game/ai/{uuid}", gameHand.Move)
 	mux.HandleFunc("/auth/reg", authHand.Register)
 	mux.HandleFunc("/auth/log", authHand.Login)
 }

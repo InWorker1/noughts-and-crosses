@@ -6,6 +6,7 @@ const (
 	X    = 1
 	O    = -1
 	Void = 0
+	Draw = -3
 )
 
 type Game struct {
