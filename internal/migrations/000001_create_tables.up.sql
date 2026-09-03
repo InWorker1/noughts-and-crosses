@@ -4,6 +4,15 @@ CREATE TABLE games(
 --     created_at timestamp with time zone default current_timestamp not null
 );
 
+CREATE TABLE online_games(
+                             id uuid not null unique, -- id игры
+                             grid int[][], -- поле игры
+                             waiting BOOLEAN not null, -- ожидание игроков
+                             move_player uuid, -- кто ходит
+                             win_player uuid, -- кто выиграл
+                             draw BOOLEAN -- ничья
+); -- таблица для состояний онлайн игры
+
 CREATE TABLE users(
                       id uuid not null unique,
                       login TEXT not null unique,
