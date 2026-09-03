@@ -8,29 +8,31 @@ import (
 	"github.com/google/uuid"
 )
 
-type middlewareStruct struct {
+type UserAuthenticator struct {
 	authService auth.AuthService
 }
 
-func NewMiddleWare(s auth.AuthService) *middlewareStruct {
-	return &middlewareStruct{authService: s}
+func NewUserAuthenticator(s auth.AuthService) *UserAuthenticator {
+	return &UserAuthenticator{authService: s}
 }
 
-func (m *middlewareStruct) Authorization(next http.HandlerFunc) http.HandlerFunc {
+func (m *UserAuthenticator) Authorization(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cred := r.Header.Get("Authorization")
-		cred = strings.TrimPrefix(cred, "Bearer ")
+		cred = strings.TrimPrefix(cred, "Basic ")
 		cred = strings.TrimSpace(cred)
-		if cred != "" {
+		if cred == "" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		id, err := m.authService.Login(cred)
-		if id != uuid.Nil {
+		if id == uuid.Nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
 		} else if err != nil {
 			http.Error(w, "sorry", http.StatusInternalServerError)
+			return
 		}
 
 		next(w, r)

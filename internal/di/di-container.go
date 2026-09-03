@@ -9,6 +9,7 @@ import (
 	"game/internal/repository/postgres"
 	"game/internal/web/authHandler"
 	game2 "game/internal/web/gameHandler"
+	"game/internal/web/middleware"
 	"net/http"
 	"os"
 
@@ -41,6 +42,7 @@ func CreateApp() fx.Option {
 			user.NewUserService,
 			auth.NewAuthService,
 			authHandler.NewAuthHandler,
+			middleware.NewUserAuthenticator,
 			NewMux,
 			NewDSN,
 		),
@@ -51,8 +53,8 @@ func CreateApp() fx.Option {
 	)
 }
 
-func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler, authHand *authHandler.AuthHandler) {
-	mux.HandleFunc("/game/ai/{uuid}", gameHand.Move)
+func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler, authHand *authHandler.AuthHandler, middleHand *middleware.UserAuthenticator) {
+	mux.HandleFunc("/game/ai/{uuid}", middleHand.Authorization(gameHand.Move))
 	mux.HandleFunc("/auth/reg", authHand.Register)
 	mux.HandleFunc("/auth/log", authHand.Login)
 }
