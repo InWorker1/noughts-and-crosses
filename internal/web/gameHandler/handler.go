@@ -40,7 +40,7 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 	} else if !flag { // флаг на то есть вообще эта игра или ее нет, если нет то мы ее создали
 		w.Header().Set("Content-Type", "application/json")
 		req = GetJson(game, 0)
-		w.WriteHeader(http.StatusOK)          // хэд статуса
+		w.WriteHeader(http.StatusCreated)     // хэд статуса
 		err := json.NewEncoder(w).Encode(req) // отправляем данные пользователю(клиенту)
 		if err != nil {
 			http.Error(w, "sorry.. ", 500)

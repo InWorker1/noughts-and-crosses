@@ -1,7 +1,11 @@
 package game
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 type gameService struct {
@@ -41,6 +45,7 @@ func (s *gameService) GetNextMove(game Game) (Game, error) {
 	if !filledGrid {
 		return game, nil
 	}
+	bestVar.g.ID = game.ID // присваиваем ему ID оригинала
 	err := s.repo.Save(bestVar.g)
 	if err != nil {
 		return Game{}, err
@@ -50,7 +55,7 @@ func (s *gameService) GetNextMove(game Game) (Game, error) {
 
 func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false когда новая игра или ошибка
 	legacyGame, err := s.repo.Get(game.ID)
-	if err != nil {
+	if errors.Is(err, pgx.ErrNoRows) {
 		grid := make([][]int, 3, 3)
 		for i := 0; i < 3; i++ {
 			grid[i] = make([]int, 3)
@@ -59,7 +64,7 @@ func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false ког�
 			}
 		}
 		game.Board.Grid = grid
-		err := s.repo.Save(Game{
+		err := s.repo.Create(Game{
 			ID: game.ID,
 			Board: GameField{
 				Grid: grid,
@@ -125,9 +130,9 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 			_ = s.repo.Delete(game.ID) // удаление игры из памяти
 			return O
 		}
-		if counterVoid == 0 {
-			return Draw
-		}
+	}
+	if counterVoid == 0 {
+		return Draw
 	}
 	return 0
 }
@@ -138,8 +143,6 @@ func (s *gameService) minimax(game Game, player, dep, symPC int) int {
 		switch winner {
 		case symPC:
 			return 10 - dep
-		case Draw:
-			return 5 - dep // добавление ничьи
 		default:
 			return -10 + dep
 		}
@@ -201,7 +204,7 @@ func whoPC(game Game) int {
 
 func gameClone(game Game) Game {
 	var clone Game
-	clone.ID = game.ID
+	clone.ID = uuid.Nil
 	clone.Board.Grid = make([][]int, 3)
 	for i := 0; i < 3; i++ {
 		clone.Board.Grid[i] = make([]int, 3)
