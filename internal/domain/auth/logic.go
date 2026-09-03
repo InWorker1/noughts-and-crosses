@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/base64"
-	"fmt"
 	"game/internal/domain/domainErrors"
 	"game/internal/domain/user"
 	"strings"
@@ -48,34 +47,18 @@ func (a *authService) Login(creds string) (uuid.UUID, error) {
 	}
 
 	cleanPart := strings.TrimSpace(parts[1])
-	fmt.Println("=== DEBUG СТАРТ ===")
-	fmt.Printf("1. Хэш из БД: %q\n", user.Pass)
-	fmt.Printf("2. Длина хэша: %d (ДОЛЖНА БЫТЬ СТРОГО 60)\n", len(user.Pass))
-	fmt.Printf("3. Чистый пароль: %q\n", parts[1])
-	fmt.Printf("4. Байты пароля: %v\n", []byte(parts[1]))
-	fmt.Println("===================")
+	//fmt.Println("=== DEBUG СТАРТ ===")
+	//fmt.Printf("1. Хэш из БД: %q\n", user.Pass)
+	//fmt.Printf("2. Длина хэша: %d (ДОЛЖНА БЫТЬ СТРОГО 60)\n", len(user.Pass))
+	//fmt.Printf("3. Чистый пароль: %q\n", parts[1])
+	//fmt.Printf("4. Байты пароля: %v\n", []byte(parts[1]))
+	//fmt.Println("===================")
 	err = bcrypt.CompareHashAndPassword([]byte(user.Pass), []byte(cleanPart))
 	if err != nil {
 		return uuid.Nil, domainErrors.ErrInvalidLoginOrPass
 	}
 
 	return user.Id, nil
-
-	//passDB, err := a.uService.GetByUsername(request.Login)
-	//if err != nil {
-	//	return "", err
-	//}
-	//
-	//err = bcrypt.CompareHashAndPassword([]byte(passDB), []byte(request.Pass))
-
-	//if err != nil {
-	//	return "", errors.New("invalid password")
-	//}
-	//
-	//token := fmt.Sprintf("%s:%s", request.Login, request.Pass)
-	//token = base64.StdEncoding.EncodeToString([]byte(token))
-	//
-	//return token, nil
 }
 
 func HashPassword(password string) (string, error) {

@@ -39,3 +39,11 @@ func (s *userService) GetPerson(login, password string) (User, error) {
 	}
 	return user, nil
 }
+
+//func (s *userService) GetRole(id uuid.UUID) (string, error) {
+//	user, err := s.repo.GetByUsername(login)
+//	if err != nil {
+//		return "", err
+//	}
+//	return user, nil
+//}

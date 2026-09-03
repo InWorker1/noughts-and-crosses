@@ -19,7 +19,7 @@ func NewUserRepo(data *dataBase) user.UserRepository {
 }
 
 func (a *userRepo) Create(user user.User) error {
-	query := "INSERT INTO users (id, login, password) VALUES ($1, $2, $3)"
+	query := `INSERT INTO users (id, login, password, role) VALUES ($1, $2, $3, 'p')`
 	_, err := a.data.db.Exec(context.Background(), query, user.Id, user.Login, user.Pass)
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func (a *userRepo) Create(user user.User) error {
 }
 
 func (a *userRepo) GetByUsername(username string) (user.User, error) {
-	query := "SELECT * FROM users WHERE login = $1"
+	query := `SELECT * FROM users WHERE login = $1`
 
 	rows, err := a.data.db.Query(context.Background(), query, username)
 
