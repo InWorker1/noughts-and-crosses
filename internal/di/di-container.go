@@ -71,7 +71,7 @@ func ListenServer(lc fx.Lifecycle, mux *http.ServeMux) {
 				err := server.ListenAndServe()
 				if err != nil {
 					fmt.Errorf("Error ListenServer: %v", err)
-				} УДАЛЯЕМ НАХУЙ МЕТОД DELETE ИЗ GAME РЕПОЗИТОРИЯ
+				}
 			}()
 			return nil
 		},
