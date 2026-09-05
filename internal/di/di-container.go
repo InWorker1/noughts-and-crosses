@@ -54,9 +54,14 @@ func CreateApp() fx.Option {
 }
 
 func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler, authHand *authHandler.AuthHandler, middleHand *middleware.UserAuthenticator) {
-	mux.HandleFunc("/game/ai/{uuid}", middleHand.Authorization(gameHand.Move))
-	mux.HandleFunc("/auth/reg", authHand.Register)
-	mux.HandleFunc("/auth/log", authHand.Login)
+	//mux.HandleFunc("/user/info", )
+	//mux.HandleFunc("/game/newgame", )
+	//mux.HandleFunc("POST /game/online/{uuid}", middleHand.Authorization())
+	//mux.HandleFunc("/user/info", )
+	//mux.HandleFunc("")
+	mux.HandleFunc("POST /game/ai/{uuid}", middleHand.Authorization(gameHand.Move))
+	mux.HandleFunc("POST /auth/reg", authHand.Register)
+	mux.HandleFunc("GET /auth/log", authHand.Login)
 }
 
 func ListenServer(lc fx.Lifecycle, mux *http.ServeMux) {

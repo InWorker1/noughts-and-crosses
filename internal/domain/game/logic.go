@@ -46,7 +46,7 @@ func (s *gameService) GetNextMove(game Game) (Game, error) {
 		return game, nil
 	}
 	bestVar.g.ID = game.ID // присваиваем ему ID оригинала
-	err := s.repo.Save(bestVar.g)
+	err := s.repo.SaveAiGame(bestVar.g)
 	if err != nil {
 		return Game{}, err
 	}
@@ -55,29 +55,29 @@ func (s *gameService) GetNextMove(game Game) (Game, error) {
 
 func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false когда новая игра или ошибка
 	legacyGame, err := s.repo.Get(game.ID)
-	if errors.Is(err, pgx.ErrNoRows) {
-		grid := make([][]int, 3, 3)
-		for i := 0; i < 3; i++ {
-			grid[i] = make([]int, 3)
-			for j := 0; j < 3; j++ {
-				grid[i][j] = Void
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			grid := createGrid()
+			game.Board.Grid = grid
+			var waiting bool
+			if game.IsOnline {
+				waiting = true
+			} else {
+				waiting = false
 			}
+			err := s.repo.Create(Game{
+				ID:      game.ID,
+				Board:   GameField{Grid: grid},
+				Waiting: waiting,
+			})
+			if err != nil {
+				return false, err
+			}
+			return false, nil
 		}
-		game.Board.Grid = grid
-		err := s.repo.Create(Game{
-			ID: game.ID,
-			Board: GameField{
-				Grid: grid,
-			},
-		})
-		if err != nil {
-			return false, err
-		}
-		return false, nil
+		return false, err
 	}
-	//if whoPC(*game) == -1 {
-	//	return false, fmt.Errorf("Invalid game")
-	//} 									я в душе не знаю откуда это появилось и зачем. не разрешает пользователю быть крестиком
+
 	counter := 0
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
@@ -88,7 +88,8 @@ func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false ког�
 				return false, fmt.Errorf("Invalid NewBoard")
 			} else if symbolNew != symbolLeg && symbolLeg == Void {
 				counter++
-			} else if counter > 1 {
+			}
+			if counter > 1 {
 				return false, fmt.Errorf("Invalid NewBoard")
 			}
 		}
@@ -213,4 +214,15 @@ func gameClone(game Game) Game {
 		}
 	}
 	return clone
+}
+
+func createGrid() [][]int {
+	grid := make([][]int, 3, 3)
+	for i := 0; i < 3; i++ {
+		grid[i] = make([]int, 3)
+		for j := 0; j < 3; j++ {
+			grid[i][j] = Void
+		}
+	}
+	return grid
 }

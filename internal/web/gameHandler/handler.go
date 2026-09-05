@@ -33,6 +33,7 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	game := GetDomain(req, gameId)
+	game.IsOnline = false
 
 	if flag, err := h.service.ValidateBoard(&game); err != nil { // ошибка плохо
 		http.Error(w, "Invalid game", http.StatusBadRequest)

@@ -10,8 +10,13 @@ const (
 )
 
 type Game struct {
-	ID    uuid.UUID
-	Board GameField
+	ID         uuid.UUID
+	Board      GameField
+	Waiting    bool
+	MovePlayer uuid.UUID
+	Winner     uuid.UUID
+	Draw       bool
+	IsOnline   bool // для определения онл игры или нет
 }
 
 type GameField struct {

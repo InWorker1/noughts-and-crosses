@@ -16,15 +16,15 @@ func NewGameRepository(store *dataBase) game.GameRepository {
 }
 
 func (repo *gameRepository) Create(game game.Game) error {
-	query := `INSERT INTO games (id, grid) VALUES ($1, $2)`
-	_, err := repo.data.db.Exec(context.Background(), query, game.ID, game.Board.Grid)
+	query := `INSERT INTO games (id, grid, waiting) VALUES ($1, $2, $3)`
+	_, err := repo.data.db.Exec(context.Background(), query, game.ID, game.Board.Grid, game.Waiting)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (repo *gameRepository) Save(game game.Game) error {
+func (repo *gameRepository) SaveAiGame(game game.Game) error {
 	unit := DomainIntoRepo(game)
 	query := `UPDATE games SET grid = $1 WHERE id = $2`
 	_, err := repo.data.db.Exec(context.Background(), query, unit.grid, unit.id)
@@ -38,11 +38,13 @@ func (repo *gameRepository) Get(id uuid.UUID) (game.Game, error) {
 	query := `SELECT * FROM games WHERE id = $1`
 	row := repo.data.db.QueryRow(context.Background(), query, id)
 	var unit sqlStore
-	if err := row.Scan(&unit.id, &unit.grid); err != nil {
+	if err := row.Scan(&unit.id, &unit.grid, &unit.waiting, &unit.movePlayer, &unit.winner, &unit.draw); err != nil {
 		return game.Game{}, err
 	}
 	return RepoIntoDomain(unit), nil
 }
+
+//func (repo *gameRepository) Save bool {}
 
 //func (repo *gameRepository) Delete(id uuid.UUID) error {
 //	query := "DELETE FROM games WHERE id = $1"
