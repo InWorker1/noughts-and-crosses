@@ -55,7 +55,7 @@ func CreateApp() fx.Option {
 
 func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler, authHand *authHandler.AuthHandler, middleHand *middleware.UserAuthenticator) {
 	//mux.HandleFunc("/user/info", )
-	//mux.HandleFunc("/game/newgame", )
+	mux.HandleFunc("POST /game/newgame", middleHand.Authorization(gameHand.CreateGame))
 	//mux.HandleFunc("POST /game/online/{uuid}", middleHand.Authorization())
 	//mux.HandleFunc("/user/info", )
 	//mux.HandleFunc("")

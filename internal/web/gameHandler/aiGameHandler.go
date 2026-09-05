@@ -25,7 +25,7 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req JsonRequest
+	var req JsonReqAiGame
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)

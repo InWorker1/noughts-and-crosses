@@ -4,7 +4,11 @@ import (
 	"game/internal/domain/game"
 )
 
-type JsonRequest struct {
+type JsonReqAiGame struct {
 	Board  game.GameField `json:"game,omitempty"`
 	Winner int            `json:"winner,omitempty"`
+}
+
+type JsonReqNewGame struct {
+	GameMode string `json:"game_mode"`
 }
