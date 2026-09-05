@@ -35,6 +35,8 @@ func (m *UserAuthenticator) Authorization(next http.HandlerFunc) http.HandlerFun
 			return
 		}
 
+		w.Header().Set("Id", id.String())
+
 		next(w, r)
 	}
 
