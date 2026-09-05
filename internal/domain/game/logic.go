@@ -226,3 +226,29 @@ func createGrid() [][]int {
 	}
 	return grid
 }
+
+func (s *gameService) SetRolesWithAi(game Game, user uuid.UUID) Game { // расдача ролей на первом ходу
+	if !game.IsOnline {
+		counter := 0
+		for i := 0; i < 3; i++ {
+			for j := 0; j < 3; j++ {
+				if game.Board.Grid[i][j] != Void {
+					counter++
+				}
+			}
+		}
+		if counter == 1 {
+			game.XPlayer = user
+			game.OPlayer, _ = uuid.Parse(BotUUID)
+			s.repo.SetRoles(game)
+		} else if counter == 0 {
+			game.XPlayer, _ = uuid.Parse(BotUUID)
+			game.OPlayer = user
+			s.repo.SetRoles(game)
+		}
+	}
+	//else if game.IsOnline {
+	//
+	//}
+	return game
+}

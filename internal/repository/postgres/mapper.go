@@ -13,6 +13,8 @@ type sqlStore struct {
 	movePlayer uuid.UUID `db:"move_player"`
 	winner     uuid.UUID `db:"winner"`
 	draw       bool      `db:"draw"`
+	xPlayer    uuid.UUID `db:"x_player"`
+	oPlayer    uuid.UUID `db:"o_player"`
 }
 
 func DomainIntoRepo(game game.Game) sqlStore {

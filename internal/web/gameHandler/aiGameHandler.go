@@ -3,17 +3,19 @@ package game
 import (
 	"encoding/json"
 	"game/internal/domain/game"
+	"game/internal/domain/user"
 	"net/http"
 
 	"github.com/google/uuid"
 )
 
 type GameHandler struct {
-	service game.GameService
+	gameService game.GameService
+	userService user.UserService
 }
 
-func NewGameHandler(s game.GameService) *GameHandler {
-	return &GameHandler{service: s}
+func NewGameHandler(gs game.GameService, us user.UserService) *GameHandler {
+	return &GameHandler{gameService: gs, userService: us}
 }
 
 func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +37,7 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 	game := GetDomain(req, gameId)
 	game.IsOnline = false
 
-	if flag, err := h.service.ValidateBoard(&game); err != nil { // ошибка плохо
+	if flag, err := h.gameService.ValidateBoard(&game); err != nil { // ошибка плохо
 		http.Error(w, "Invalid game", http.StatusBadRequest)
 		return
 	} else if !flag { // флаг на то есть вообще эта игра или ее нет, если нет то мы ее создали
@@ -50,12 +52,19 @@ func (h *GameHandler) Move(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	game, err = h.service.GetNextMove(game)
+	userId, err := uuid.Parse(r.Header.Get("id"))
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+
+	game = h.gameService.SetRolesWithAi(game, userId) // будет только в случае первого хода
+	game, err = h.gameService.GetNextMove(game)
 	if err != nil {
 		http.Error(w, "sorry..", 500)
 		return
 	}
-	req = GetJson(game, h.service.GameOver(game))
+	req = GetJson(game, h.gameService.GameOver(game))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)         // хэд статуса

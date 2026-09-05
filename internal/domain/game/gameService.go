@@ -9,6 +9,7 @@ type GameService interface {
 	ValidateBoard(game *Game) (bool, error)
 	GameOver(game Game) int
 
+	SetRolesWithAi(game Game, user uuid.UUID) Game
 }
 
 type GameRepository interface {
@@ -17,5 +18,6 @@ type GameRepository interface {
 	Get(id uuid.UUID) (Game, error)
 	//SaveOnlineGame(game Game) error
 
+	SetRoles(game Game) error
 	//Delete(id uuid.UUID) error
 }

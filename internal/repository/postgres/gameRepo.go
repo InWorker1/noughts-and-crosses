@@ -38,10 +38,19 @@ func (repo *gameRepository) Get(id uuid.UUID) (game.Game, error) {
 	query := `SELECT * FROM games WHERE id = $1`
 	row := repo.data.db.QueryRow(context.Background(), query, id)
 	var unit sqlStore
-	if err := row.Scan(&unit.id, &unit.grid, &unit.waiting, &unit.movePlayer, &unit.winner, &unit.draw); err != nil {
+	if err := row.Scan(&unit.id, &unit.grid, &unit.waiting, &unit.movePlayer, &unit.winner, &unit.draw, &unit.xPlayer, &unit.oPlayer); err != nil {
 		return game.Game{}, err
 	}
 	return RepoIntoDomain(unit), nil
+}
+
+func (repo *gameRepository) SetRoles(game game.Game) error {
+	query := `UPDATE games SET x_player = $1, o_player = $2 WHERE id = $3`
+	_, err := repo.data.db.Exec(context.Background(), query, game.XPlayer, game.OPlayer, game.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 //func (repo *gameRepository) Save bool {}
