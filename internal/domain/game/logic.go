@@ -106,10 +106,8 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 		diaR += game.Board.Grid[i][2-i]
 	}
 	if diaL == 3 || diaR == 3 {
-		_ = s.repo.Delete(game.ID) // удаление игры из памяти
 		return X
 	} else if diaL == -3 || diaR == -3 {
-		_ = s.repo.Delete(game.ID) // удаление игры из памяти
 		return O
 	}
 	var counterVoid int
@@ -124,10 +122,8 @@ func (s *gameService) GameOver(game Game) int { // выдает победите
 			ver += game.Board.Grid[j][i]
 		}
 		if hor == 3 || ver == 3 {
-			_ = s.repo.Delete(game.ID) // удаление игры из памяти
 			return X
 		} else if hor == -3 || ver == -3 {
-			_ = s.repo.Delete(game.ID) // удаление игры из памяти
 			return O
 		}
 	}

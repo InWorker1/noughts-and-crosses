@@ -15,10 +15,6 @@ func NewGameRepository(store *dataBase) game.GameRepository {
 	return &gameRepository{data: store}
 }
 
-//Save(game Game) error
-//Get(id uuid.UUID) (Game, error)
-//Delete(id uuid.UUID) error
-
 func (repo *gameRepository) Create(game game.Game) error {
 	query := `INSERT INTO games (id, grid) VALUES ($1, $2)`
 	_, err := repo.data.db.Exec(context.Background(), query, game.ID, game.Board.Grid)
@@ -48,11 +44,11 @@ func (repo *gameRepository) Get(id uuid.UUID) (game.Game, error) {
 	return RepoIntoDomain(unit), nil
 }
 
-func (repo *gameRepository) Delete(id uuid.UUID) error {
-	query := "DELETE FROM games WHERE id = $1"
-	_, err := repo.data.db.Exec(context.Background(), query, id)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (repo *gameRepository) Delete(id uuid.UUID) error {
+//	query := "DELETE FROM games WHERE id = $1"
+//	_, err := repo.data.db.Exec(context.Background(), query, id)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
