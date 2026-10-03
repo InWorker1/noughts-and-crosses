@@ -1,44 +1,44 @@
 package sync_map
 
-import (
-	"fmt"
-	"game/internal/domain/game"
+// import (
+// 	"fmt"
+// 	"game/internal/domain/game"
 
-	"github.com/google/uuid"
-)
+// 	"github.com/google/uuid"
+// )
 
-type gameRepository struct { // структура, которая реализует интерфейс domain.GameRepository
-	storage *GameStorage
-}
+// type gameRepository struct { // структура, которая реализует интерфейс domain.GameRepository
+// 	storage *GameStorage
+// }
 
-func NewGameRepo(s *GameStorage) game.GameRepository {
-	return &gameRepository{storage: s}
-}
+// func NewGameRepo(s *GameStorage) game.GameRepository {
+// 	return &gameRepository{storage: s}
+// }
 
-func (r *gameRepository) Save(game game.Game) error {
-	ds := GameIntoDS(game)
-	r.storage.data.Store(ds.Key, ds)
-	return nil
-}
+// func (r *gameRepository) Save(game game.Game) error {
+// 	ds := GameIntoDS(game)
+// 	r.storage.data.Store(ds.Key, ds)
+// 	return nil
+// }
 
-func (r *gameRepository) Get(id uuid.UUID) (game.Game, error) {
-	val, ok := r.storage.data.Load(id)
-	if !ok {
-		return game.Game{}, fmt.Errorf("failed game with ID %s not found", id)
-	}
+// func (r *gameRepository) Get(id uuid.UUID) (game.Game, error) {
+// 	val, ok := r.storage.data.Load(id)
+// 	if !ok {
+// 		return game.Game{}, fmt.Errorf("failed game with ID %s not found", id)
+// 	}
 
-	ds, ok := val.(Storage)
-	if !ok {
-		return game.Game{}, fmt.Errorf("failed to cast data from store")
-	}
-	return DSIntoGame(ds), nil
-}
+// 	ds, ok := val.(Storage)
+// 	if !ok {
+// 		return game.Game{}, fmt.Errorf("failed to cast data from store")
+// 	}
+// 	return DSIntoGame(ds), nil
+// }
 
-func (r *gameRepository) Delete(id uuid.UUID) error {
-	_, ok := r.storage.data.Load(id)
-	if !ok {
-		return fmt.Errorf("failed delete game", id)
-	}
-	r.storage.data.Delete(id)
-	return nil
-}
+// func (r *gameRepository) Delete(id uuid.UUID) error {
+// 	_, ok := r.storage.data.Load(id)
+// 	if !ok {
+// 		return fmt.Errorf("failed delete game", id)
+// 	}
+// 	r.storage.data.Delete(id)
+// 	return nil
+// }

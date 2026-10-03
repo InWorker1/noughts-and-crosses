@@ -10,6 +10,7 @@ type GameService interface {
 	GameOver(game Game) int
 
 	SetRolesWithAi(game Game, user uuid.UUID) Game
+	//SetRolesWithRP(game Game, ...) // тут реализовать рандом с раздачей ролей сразу. придумать как получить uuid сразу двух пользователей
 }
 
 type GameRepository interface {

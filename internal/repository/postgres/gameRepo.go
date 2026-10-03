@@ -11,7 +11,7 @@ type gameRepository struct {
 	data *dataBase
 }
 
-func NewGameRepository(store *dataBase) game.GameRepository {
+func NewGameRepository(store *dataBase) *gameRepository { // тут возвращался interface, я поменял на структуру
 	return &gameRepository{data: store}
 }
 
