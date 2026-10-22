@@ -77,6 +77,9 @@ func (s *gameService) ValidateBoard(game *Game) (bool, error) { // false ког�
 		}
 		return false, err
 	}
+	if !validGrid(game.Board.Grid) { // без этого кривая доска даёт панику index out of range
+		return false, fmt.Errorf("Invalid NewBoard")
+	}
 
 	counter := 0
 	for i := 0; i < 3; i++ {
@@ -225,6 +228,24 @@ func createGrid() [][]int {
 		}
 	}
 	return grid
+}
+
+func (s *gameService) FindOnlineGame(user uuid.UUID) (uuid.UUID, error) { // заходим в ожидающую игру или создаем новую
+	id, err := s.repo.JoinWaitingGame(user)
+	if err == nil {
+		return id, nil
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return uuid.Nil, err
+	}
+	id = uuid.New()
+	err = s.repo.CreateOnline(Game{
+		ID:      id,
+		Board:   GameField{Grid: createGrid()},
+		Waiting: true,
+		XPlayer: user,
+	})
+	return id, err
 }
 
 func (s *gameService) SetRolesWithAi(game Game, user uuid.UUID) Game { // расдача ролей на первом ходу

@@ -35,8 +35,8 @@ func CreateApp() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			postgres.NewGameDataBase,
-			postgres.NewGameRepository,
 			postgres.NewUserRepo,
+			postgres.NewGameRepository,
 			game.NewGameService,
 			game2.NewGameHandler,
 			user.NewUserService,
@@ -56,7 +56,7 @@ func CreateApp() fx.Option {
 func RegisterRout(mux *http.ServeMux, gameHand *game2.GameHandler, authHand *authHandler.AuthHandler, middleHand *middleware.UserAuthenticator) {
 	//mux.HandleFunc("/user/info", )
 	mux.HandleFunc("POST /game/newgame", middleHand.Authorization(gameHand.CreateGame))
-	//mux.HandleFunc("POST /game/online/{uuid}", middleHand.Authorization())
+	mux.HandleFunc("POST /game/online/{uuid}", middleHand.Authorization(gameHand.OnlineGameStart))
 	//mux.HandleFunc("/user/info", )
 	//mux.HandleFunc("")
 	mux.HandleFunc("POST /game/ai/{uuid}", middleHand.Authorization(gameHand.Move))

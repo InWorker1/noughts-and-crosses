@@ -23,7 +23,9 @@ func DomainIntoRepo(game game.Game) sqlStore {
 		waiting:    game.Waiting,
 		movePlayer: game.MovePlayer,
 		winner:     game.Winner,
-		draw:       game.Draw}
+		draw:       game.Draw,
+		xPlayer:    game.XPlayer,
+		oPlayer:    game.OPlayer}
 }
 
 func RepoIntoDomain(store sqlStore) game.Game {
@@ -32,5 +34,7 @@ func RepoIntoDomain(store sqlStore) game.Game {
 		Waiting:    store.waiting,
 		MovePlayer: store.movePlayer,
 		Winner:     store.winner,
-		Draw:       store.draw}
+		Draw:       store.draw,
+		XPlayer:    store.xPlayer,
+		OPlayer:    store.oPlayer}
 }
